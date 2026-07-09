@@ -1,0 +1,69 @@
+# =========================
+# Laravel
+# =========================
+
+/vendor
+/node_modules
+/public/build
+/public/hot
+/storage/*.key
+/storage/logs/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/testing/*
+/storage/framework/views/*
+/bootstrap/cache/*
+
+# Keep required directories
+!/storage/framework/cache/.gitignore
+!/storage/framework/sessions/.gitignore
+!/storage/framework/testing/.gitignore
+!/storage/framework/views/.gitignore
+!/bootstrap/cache/.gitignore
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Laravel Pint
+.pint.cache
+
+# PHPUnit
+.phpunit.cache
+.phpunit.result.cache
+
+# Composer
+composer.phar
+
+# IDE
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# =========================
+# Claude Code
+# =========================
+
+.claude/
+.claude-cache/
+.claude.json
+.claude.json.lock
+.claude/settings.local.json
+.claude/history/
+.claude/sessions/
+
+# Claude AI generated context
+CLAUDE.md
+.claude.md
+
+# MCP
+.mcp.json
