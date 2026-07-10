@@ -25,7 +25,6 @@ class UpdateGachaEventRequest extends FormRequest
             'items.*.name' => ['required_with:items', 'string', 'max:255'],
             'items.*.rarity' => ['required_with:items', 'in:common,rare,legendary'],
             'items.*.drop_rate' => ['required_with:items', 'numeric', 'min:0.01', 'max:100'],
-            'items.*.drop_rate_percent' => ['required_with:items', 'numeric', 'min:0.01', 'max:100'],
             'items.*.image_url' => ['nullable', 'string', 'max:2048'],
         ];
     }

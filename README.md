@@ -1,5 +1,3 @@
-
-
 git clone → cd gacha-api
 composer install
 cp .env.example .env → edit bagian DB_* sesuai database MySQL

@@ -16,7 +16,7 @@ class GachaHistoryController extends Controller
     public function index(Request $request)
     {
         $histories = GachaHistory::query()
-            ->with(['user:id,name,email', 'event', 'item'])
+            ->with(['user:id,name,email', 'event:id,name,is_active', 'item'])
             ->when($request->filled('gacha_event_id'), fn ($q) => $q->where('gacha_event_id', $request->integer('gacha_event_id')))
             ->when($request->filled('user_id'), fn ($q) => $q->where('user_id', $request->integer('user_id')))
             ->latest()

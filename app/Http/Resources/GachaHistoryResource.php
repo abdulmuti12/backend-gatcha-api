@@ -14,8 +14,13 @@ class GachaHistoryResource extends JsonResource
             'user' => $this->whenLoaded('user', fn () => [
                 'id' => $this->user->id,
                 'name' => $this->user->name,
+                'email' => $this->user->email,
             ]),
-            'event_name' => $this->whenLoaded('event', fn () => $this->event->name),
+            'event' => $this->whenLoaded('event', fn () => [
+                'id' => $this->event->id,
+                'name' => $this->event->name,
+                'is_active' => $this->event->is_active,
+            ]),
             'item' => [
                 'name' => $this->whenLoaded('item', fn () => $this->item->name),
                 'rarity' => $this->whenLoaded('item', fn () => $this->item->rarity),
