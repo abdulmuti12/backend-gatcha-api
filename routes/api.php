@@ -59,8 +59,7 @@ Route::prefix('admin/auth')->group(function () {
 */
 Route::prefix('admin')->middleware('auth:admin-api')->group(function () {
     Route::get('dashboard/stats', [DashboardController::class, 'stats']);
-    Route::apiResource('gacha-events', GachaEventController::class)->except(['update']);
-    Route::put('gacha-events/{event}', [GachaEventController::class, 'update']);
+    Route::apiResource('gacha-events', GachaEventController::class);
     Route::put('gacha-events/{event}/items', [GachaEventController::class, 'updateItems']);
 
     Route::get('gacha-histories', [AdminGachaHistoryController::class, 'index']);

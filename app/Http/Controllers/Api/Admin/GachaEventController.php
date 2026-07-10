@@ -5,11 +5,14 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Exceptions\InvalidGachaEventException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreGachaEventRequest;
+use App\Http\Requests\Admin\UpdateGachaEventRequest;
 use App\Http\Requests\Admin\UpdateGachaItemsRequest;
 use App\Http\Resources\GachaEventResource;
 use App\Models\GachaEvent;
 use App\Services\GachaEventAdminService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+
 
 class GachaEventController extends Controller
 {
@@ -55,27 +58,68 @@ class GachaEventController extends Controller
         return new GachaEventResource($event);
     }
 
-    public function update(Request $request, GachaEvent $event)
-    {
-        $data = $request->validate([
-            'name' => ['sometimes', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'cost_per_pull' => ['sometimes', 'integer', 'min:1'],
-            'is_active' => ['sometimes', 'boolean'],
-            'starts_at' => ['nullable', 'date'],
-            'ends_at' => ['nullable', 'date'],
-        ]);
+    /**
+     * Update event + items sekaligus (patch/partial update).
+     * Field opsional: name, description, cost_per_pull, is_active, starts_at, ends_at, items.
+     */
+    public function update(UpdateGachaEventRequest $request, GachaEvent $gacha_event)
+{
+    $event = $gacha_event;
+    $data = $request->validated();
+    $itemsInput = $data['items'] ?? null;
+    unset($data['items']);
 
+
+
+    Log::info('GachaEvent update: request received', [
+        'event_id' => $event->id,
+        'fields' => array_keys($data),
+        'data' => $data,
+        'items_count' => is_array($itemsInput) ? count($itemsInput) : null,
+    ]);
+
+    if (! empty($data)) {
         $event->update($data);
-
-        return new GachaEventResource($event->load('items'));
+        Log::info('GachaEvent update: base fields updated', [
+            'event_id' => $event->id,
+            'updated_fields' => array_keys($data),
+        ]);
     }
 
+    if ($itemsInput !== null) {
+        try {
+            $normalized = $this->normalizeItems($itemsInput);
+            $event = $this->adminService->replaceItems($event, $normalized);
+
+            Log::info('GachaEvent update: items replaced successfully', [
+                'event_id' => $event->id,
+                'items_count' => count($normalized),
+            ]);
+        } catch (InvalidGachaEventException $e) {
+            Log::error('GachaEvent update: failed to replace items', [
+                'event_id' => $event->id,
+                'error' => $e->getMessage(),
+                'items_input' => $itemsInput,
+            ]);
+
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+    }
+
+    $event->refresh();
+
+    Log::info('GachaEvent update: success', [
+        'event_id' => $event->id,
+    ]);
+
+    return new GachaEventResource($event->load('items'));
+}
     /**
      * Ganti seluruh daftar item + drop rate pada event ini (wajib total 100%).
      */
-    public function updateItems(UpdateGachaItemsRequest $request, GachaEvent $event)
+    public function updateItems(UpdateGachaItemsRequest $request, GachaEvent $gacha_event)
     {
+        $event = $gacha_event;
         $items = $this->normalizeItems($request->validated('items'));
 
         try {
